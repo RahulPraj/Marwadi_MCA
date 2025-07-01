@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const {Cart} = require('../model/Cart');
 const {User} = require("../model/User");
 const {Product} = require('../model/Product');
+const sendEmail = require("../utils/userEmail");
 
 
 
@@ -224,6 +225,17 @@ const payment = async(req,res)=>{
         success_url:`${curentUrl}/success`,
         cancel_url:`${curentUrl}/cancel`
       })
+
+      //send email to user
+      await sendEmail(
+        user.email,
+        
+        user.cart.products.map((item)=>({
+          name:item.product.name,
+          price:item.product.price
+        }))
+      )
+
       //empty cart
       user.cart.products=[];
       user.cart.total = 0;
